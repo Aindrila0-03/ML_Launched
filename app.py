@@ -1,9 +1,14 @@
 from PIL import Image
 from flask import Flask, render_template, request
+
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Tells TensorFlow to use CPU only
+
+
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
-import os
+
 
 
 # Flask setup
