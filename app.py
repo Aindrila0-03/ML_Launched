@@ -46,6 +46,10 @@ def index():
         img_file = request.files.get('image')
         if img_file:
             try:
+                # Validate file type
+                if not img_file.filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    return "Unsupported file type. Please upload a PNG or JPG image.", 400
+
                 # Save the uploaded image
                 path = os.path.join(UPLOAD_FOLDER, img_file.filename)
                 img_file.save(path)
@@ -68,7 +72,7 @@ def index():
 
             except Exception as e:
                 logging.error(f"Error processing image: {e}")
-                prediction = "An error occurred while processing the image."
+                return "An error occurred while processing the image.", 500
 
     return render_template('index.html',
                            prediction=prediction,
