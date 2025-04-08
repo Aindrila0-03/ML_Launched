@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 # Load model
-model = tf.keras.models.load_model('cifar10_model.keras')
+model = tf.keras.models.load_model('cifar10_model.h5')
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
 
