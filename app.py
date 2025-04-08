@@ -2,11 +2,12 @@ from PIL import Image
 from flask import Flask, render_template, request
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import tensorflow as tf
 import numpy as np
 import os
 
 # Load model
-model = load_model('cifar10_model.keras')
+model = tf.keras.models.load_model('cifar10_model.keras')
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
 
@@ -23,6 +24,7 @@ def index():
     img_path = ""
 
     if request.method == 'POST':
+      prediction = model.predict(...)  # e.g., use the uploaded image here
         img_file = request.files['image']
         if img_file:
             path = os.path.join(UPLOAD_FOLDER, img_file.filename)
