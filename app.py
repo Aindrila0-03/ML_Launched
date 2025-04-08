@@ -25,7 +25,7 @@ def index():
 
     if request.method == 'POST':
       prediction = model.predict(...)  # e.g., use the uploaded image here
-        img_file = request.files['image']
+      img_file = request.files['image']
         if img_file:
             path = os.path.join(UPLOAD_FOLDER, img_file.filename)
             img_file.save(path)
