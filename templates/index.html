@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CIFAR-10 Image Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        img {
+            max-width: 300px;
+            height: auto;
+            margin-top: 20px;
+        }
+        h2, h3 {
+            margin-top: 10px;
+            color: #333;
+        }
+        .correct {
+            color: green;
+        }
+        .wrong {
+            color: red;
+        }
+         .upload-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    </style>
+</head>
+<body>
+    <h1>CIFAR-10 Image Classifier</h1>
+
+    <div class="upload-box">
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" required>
+        <br><br>
+        <button type="submit">Upload & Predict</button>
+    </form>
+
+    {% if img_path %}
+        <img src="{{ img_path }}" alt="Uploaded Image">
+        <h3>Uploaded Image<h3>
+        {% if prediction %}
+            <h2>{{ prediction }}</h2>
+        {% endif %}
+        {% if is_correct is not none %}
+            <h3 class="{{ 'correct' if is_correct else 'wrong' }}">
+                {{ 'It\'s correct!' if is_correct else 'It\'s wrong!' }}
+            </h3>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
