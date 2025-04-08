@@ -5,6 +5,10 @@ from tensorflow.keras.preprocessing import image
 import tensorflow as tf
 import numpy as np
 import os
+import logging
+
+# Set up logging
+logging.basicConfig(filename='app.log', level=logging.ERROR)
 
 # Check GPU availability
 gpus = tf.config.list_physical_devices('GPU')
@@ -18,7 +22,7 @@ try:
     model = tf.keras.models.load_model('cifar10_model.h5')
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 except Exception as e:
-    print(f"Error loading model: {e}")
+    logging.error(f"Error loading model: {e}")
 
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
@@ -27,8 +31,9 @@ class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB upload limit
 
+# Use an absolute path for the upload folder
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static')
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route('/', methods=['GET', 'POST'])
@@ -41,13 +46,16 @@ def index():
         img_file = request.files.get('image')
         if img_file:
             try:
+                # Save the uploaded image
                 path = os.path.join(UPLOAD_FOLDER, img_file.filename)
                 img_file.save(path)
 
+                # Load and preprocess the image
                 img = image.load_img(path, target_size=(32, 32))
                 img_array = image.img_to_array(img) / 255.0
                 img_array = np.expand_dims(img_array, axis=0)
 
+                # Make prediction
                 pred = model.predict(img_array)
                 predicted_class = class_names[np.argmax(pred)]
                 prediction = f"Prediction: {predicted_class}"
@@ -56,10 +64,11 @@ def index():
                 actual_label = img_file.filename.split('.')[0].lower()
                 is_correct = (predicted_class.lower() == actual_label)
 
-                img_path = os.path.join('static', img_file.filename)
+                img_path = os.path.join('static/uploads', img_file.filename)
 
             except Exception as e:
-                prediction = f"Error processing image: {e}"
+                logging.error(f"Error processing image: {e}")
+                prediction = "An error occurred while processing the image."
 
     return render_template('index.html',
                            prediction=prediction,
@@ -68,9 +77,10 @@ def index():
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    return str(e), 500
+    logging.error(f"Unhandled Exception: {e}")
+    return "An internal error occurred. Please try again later.", 500
 
 if __name__ == '__main__':
-    # Set environment variable to use CPU if needed
-    # os.environ["CUDA_VISIBLE_DEVICES"] = ""  # Uncomment to force CPU usage
+    # Uncomment the following line to force CPU usage
+    # os.environ["CUDA_VISIBLE_DEVICES"] = ""
     app.run(debug=True)
