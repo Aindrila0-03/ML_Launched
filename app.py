@@ -28,27 +28,25 @@ def index():
     if request.method == 'POST':
         img_file = request.files.get('image')
         if img_file:
-            path = os.path.join(UPLOAD_FOLDER, img_file.filename)
-            img_file.save(path)
+            try:
+                path = os.path.join(UPLOAD_FOLDER, img_file.filename)
+                img_file.save(path)
 
-            img = image.load_img(path, target_size=(32, 32))
-            img_array = image.img_to_array(img) / 255.0
-            img_array = np.expand_dims(img_array, axis=0)
+                img = image.load_img(path, target_size=(32, 32))
+                img_array = image.img_to_array(img) / 255.0
+                img_array = np.expand_dims(img_array, axis=0)
 
-            pred = model.predict(img_array)
-            predicted_class = class_names[np.argmax(pred)]
-            prediction = f"Prediction: {predicted_class}"
+                pred = model.predict(img_array)
+                predicted_class = class_names[np.argmax(pred)]
+                prediction = f"Prediction: {predicted_class}"
 
-            # Optional label check from filename (e.g., cat.jpg → cat)
-            actual_label = img_file.filename.split('.')[0].lower()
-            is_correct = (predicted_class.lower() == actual_label)
+                actual_label = img_file.filename.split('.')[0].lower()
+                is_correct = (predicted_class.lower() == actual_label)
 
-            img_path = os.path.join('static', img_file.filename)
+                img_path = os.path.join('static', img_file.filename)
 
-            return render_template('index.html',
-                                   prediction=prediction,
-                                   img_path=img_path,
-                                   is_correct=is_correct)
+            except Exception as e:
+                prediction = f"Error processing image: {e}"
 
     return render_template('index.html',
                            prediction=prediction,
