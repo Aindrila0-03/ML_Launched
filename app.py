@@ -6,8 +6,20 @@ import tensorflow as tf
 import numpy as np
 import os
 
+# Check GPU availability
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    print(f"Num GPUs Available: {len(gpus)}")
+else:
+    print("No GPUs available, using CPU.")
+
 # Load model once globally
-model = tf.keras.models.load_model('cifar10_model.h5')
+try:
+    model = tf.keras.models.load_model('cifar10_model.h5')
+    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+except Exception as e:
+    print(f"Error loading model: {e}")
+
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
 
@@ -40,6 +52,7 @@ def index():
                 predicted_class = class_names[np.argmax(pred)]
                 prediction = f"Prediction: {predicted_class}"
 
+                # Optional label check from filename (e.g., cat.jpg → cat)
                 actual_label = img_file.filename.split('.')[0].lower()
                 is_correct = (predicted_class.lower() == actual_label)
 
@@ -53,5 +66,11 @@ def index():
                            img_path=img_path,
                            is_correct=is_correct)
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return str(e), 500
+
 if __name__ == '__main__':
+    # Set environment variable to use CPU if needed
+    # os.environ["CUDA_VISIBLE_DEVICES"] = ""  # Uncomment to force CPU usage
     app.run(debug=True)
