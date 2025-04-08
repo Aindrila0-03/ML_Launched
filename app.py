@@ -5,13 +5,15 @@ from tensorflow.keras.preprocessing import image
 import numpy as np
 import os
 
+
+# Flask setup
+app = Flask(__name__)
+
 # Load model
 model = load_model('cifar10_model.keras')
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
 
-# Flask setup
-app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
